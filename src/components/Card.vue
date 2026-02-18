@@ -1,33 +1,21 @@
 <script setup>
-import { ref } from 'vue'
-
 const props = defineProps({
   label: { type: String, required: true },
   index: { type: Number, default: 0 },
   imageUrl: { type: String, default: null },
+  isPriority: { type: Boolean, default: false },
 })
-
-const imageError = ref(false)
-
-function handleImageError() {
-  imageError.value = true
-}
-
-function handleImageLoad() {
-  imageError.value = false
-}
 </script>
 
 <template>
   <div class="card">
     <div class="card-content">
-      <div v-if="imageUrl && !imageError" class="card-image">
+      <div v-if="imageUrl" class="card-image">
         <img 
           :src="imageUrl" 
           :alt="label" 
-          @error="handleImageError"
-          @load="handleImageLoad"
-          loading="lazy"
+          loading="eager"
+          :fetchpriority="isPriority ? 'high' : 'auto'"
           decoding="async"
         />
       </div>

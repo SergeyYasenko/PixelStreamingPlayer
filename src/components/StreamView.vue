@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, shallowRef } from 'vue'
 import { usePixelStreaming } from '../composables/usePixelStreaming'
 import NavigationScreen from './NavigationScreen.vue'
 import Card from './Card.vue'
@@ -78,6 +78,7 @@ const selectedCategory = ref(savedState.category)
 const currentVideoIndex = ref(savedState.videoIndex)
 const showExitModal = ref(false)
 const showVideoUI = ref(true)
+const isSleepMode = ref(false)
 let mouseMoveTimer = null
 let lastMouseMoveTime = 0
 
@@ -118,14 +119,12 @@ const {
   signallingServerUrl: 'ws://localhost:80', // Дефолтный адрес сервера
 })
 
-// Текущие карточки для отображения
+// Текущие карточки для отображения (максимально оптимизировано)
 const currentCards = computed(() => {
   if (currentLevel.value === 0) return LEVEL1_CARDS
   if (currentLevel.value >= 1) {
     const categoryCommand = selectedCategory.value?.command
-    return categoryCommand 
-      ? (LEVEL2_CARDS_BY_CATEGORY[categoryCommand] || [])
-      : []
+    return categoryCommand ? (LEVEL2_CARDS_BY_CATEGORY[categoryCommand] || []) : []
   }
   return []
 })
@@ -141,12 +140,39 @@ function handleCardClick(event) {
     // Клик на карточку первого уровня -> переходим на второй уровень
     selectedCategory.value = card
     currentLevel.value = 1
+    
+    // Принудительная загрузка изображений второго уровня в кеш
+    const categoryCards = LEVEL2_CARDS_BY_CATEGORY[card.command] || []
+    categoryCards.forEach(cardItem => {
+      // Используем Image объект для мгновенной загрузки в кеш
+      const img = new Image()
+      img.src = cardItem.imageUrl
+    })
   } else if (level === 2) {
     // Клик на карточку второго уровня -> переходим в режим видео
     const cards = currentCards.value
     currentVideoIndex.value = cards.findIndex(c => c.command === card.command)
     if (currentVideoIndex.value === -1) currentVideoIndex.value = 0
     currentLevel.value = 2
+    
+    // Отправляем команду в UE в формате строк: "project:project1" и "selection:selection1"
+    const projectCommand = selectedCategory.value?.command || ''
+    const selectionCommand = card.command || ''
+    
+    if (projectCommand && selectionCommand) {
+      // Извлекаем номер проекта из команды (Category1 -> 1, Category2 -> 2, и т.д.)
+      const projectMatch = projectCommand.match(/Category(\d+)/)
+      const projectNumber = projectMatch ? projectMatch[1] : '1'
+      
+      // Извлекаем номер селекции из команды (Video1_1 -> 1, Video1_2 -> 2, и т.д.)
+      const selectionMatch = selectionCommand.match(/Video\d+_(\d+)/)
+      const selectionNumber = selectionMatch ? selectionMatch[1] : '1'
+      
+      // Отправляем две отдельные команды в формате строк
+      emitUIInteraction(`project:project${projectNumber}`)
+      emitUIInteraction(`selection:selection${selectionNumber}`)
+    }
+    
     // Показываем интерфейс при переходе в режим видео
     showVideoUI.value = true
     // Запускаем таймер скрытия
@@ -172,18 +198,33 @@ function handleVideoPrev() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value - 1 + cards.length) % cards.length
+  
+  // Отправляем команду в UE
+  emitUIInteraction('prev')
 }
 
 function handleVideoNext() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value + 1) % cards.length
+  
+  // Отправляем команду в UE
+  emitUIInteraction('next')
 }
 
 function handleSleepMode() {
-  // Обработчик спящего режима
-  // Пока что просто логируем, позже можно добавить отправку команды в UE
-  console.log('Sleep mode activated')
+  // Отправляем команду в UE
+  emitUIInteraction('sleep')
+  // Включаем режим сна
+  isSleepMode.value = true
+}
+
+function handleNoSleep() {
+  // Отправляем команду в UE
+  emitUIInteraction('nosleep')
+  // Выключаем режим сна и показываем интерфейс
+  isSleepMode.value = false
+  showVideoUI.value = true
 }
 
 function handleCloseClick() {
@@ -191,6 +232,9 @@ function handleCloseClick() {
 }
 
 function handleExitConfirm() {
+  // Отправляем команду в UE
+  emitUIInteraction('exit')
+  
   // Закрываем сессию
   showExitModal.value = false
   // Можно закрыть окно или отправить команду в UE
@@ -204,9 +248,9 @@ function handleExitCancel() {
 }
 
 function handleMouseMove(event) {
-  // Throttling: обрабатываем не чаще чем раз в 150ms (увеличено для лучшей производительности)
+  // Throttling: обрабатываем не чаще чем раз в 200ms для лучшей производительности
   const now = Date.now()
-  if (now - lastMouseMoveTime < 150) {
+  if (now - lastMouseMoveTime < 200) {
     return
   }
   lastMouseMoveTime = now
@@ -215,7 +259,7 @@ function handleMouseMove(event) {
     return
   }
   
-  // Проверяем, не на элементе интерфейса ли курсор (без requestAnimationFrame для простоты)
+  // Кешируем проверку для лучшей производительности
   const target = event.target
   const isOnUI = target.closest('.video-ui') || 
                  target.closest('.top-back-btn') || 
@@ -277,6 +321,32 @@ function handleUIMouseEnter() {
 onMounted(() => {
   init(videoContainer.value)
   
+  // Агрессивная предзагрузка ВСЕХ изображений первого уровня
+  LEVEL1_CARDS.forEach((card, idx) => {
+    setTimeout(() => {
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = card.imageUrl
+      link.fetchPriority = 'high'
+      document.head.appendChild(link)
+      
+      // Также создаем Image объект для принудительной загрузки в кеш
+      const img = new Image()
+      img.src = card.imageUrl
+    }, idx * 10) // Небольшая задержка чтобы не блокировать
+  })
+  
+  // Предзагружаем изображения всех категорий второго уровня заранее
+  Object.values(LEVEL2_CARDS_BY_CATEGORY).forEach((cards, catIdx) => {
+    setTimeout(() => {
+      cards.forEach((card, cardIdx) => {
+        const img = new Image()
+        img.src = card.imageUrl
+      })
+    }, 100 + catIdx * 50)
+  })
+  
   // Восстанавливаем состояние интерфейса для режима видео
   if (currentLevel.value === 2) {
     showVideoUI.value = true
@@ -313,7 +383,7 @@ onUnmounted(() => {
     
     <!-- Навигационные экраны (поверх видео) -->
     <Transition name="fade" mode="out-in">
-      <div v-if="currentLevel < 2" key="nav" class="navigation-overlay">
+      <div v-if="currentLevel < 2 && !isSleepMode" key="nav" class="navigation-overlay">
         <NavigationScreen
           :level="currentLevel === 0 ? 1 : 2"
           :cards="currentCards"
@@ -326,7 +396,7 @@ onUnmounted(() => {
     
     <!-- Режим видео: карточки внизу + стрелки -->
     <Transition name="fade" mode="out-in">
-      <div v-if="isVideoMode" key="video" class="video-mode-overlay">
+      <div v-if="isVideoMode && !isSleepMode" key="video" class="video-mode-overlay">
         <Transition name="fade">
           <div v-if="showVideoUI" class="video-ui" @click="handleUIClick" @mouseenter="handleUIMouseEnter">
             <button class="nav-arrow nav-arrow-side nav-arrow-side-left" @click="handleVideoPrev">
@@ -352,9 +422,11 @@ onUnmounted(() => {
                   @click="handleCardClick({ card, level: 2 })"
                 >
                   <Card 
+                    :key="`video-card-${index}-${card.command}`"
                     :label="card.label" 
                     :index="index" 
-                    :image-url="card.imageUrl" 
+                    :image-url="card.imageUrl"
+                    :is-priority="index === currentVideoIndex"
                   />
                 </div>
               </div>
@@ -367,7 +439,7 @@ onUnmounted(() => {
     <!-- Кнопка "Назад" (слева вверху, видна когда не на начальном экране) -->
     <Transition name="fade">
       <button 
-        v-if="currentLevel > 0 && (!isVideoMode || showVideoUI)"
+        v-if="currentLevel > 0 && (!isVideoMode || showVideoUI) && !isSleepMode"
         class="top-back-btn"
         @click="handleBack"
         @mouseenter="handleUIMouseEnter"
@@ -382,7 +454,7 @@ onUnmounted(() => {
     <!-- Кнопка закрытия (справа вверху) -->
     <Transition name="fade">
       <button 
-        v-if="!isVideoMode || showVideoUI"
+        v-if="(!isVideoMode || showVideoUI) && !isSleepMode"
         class="top-close-btn"
         @click="handleCloseClick"
         @mouseenter="handleUIMouseEnter"
@@ -398,7 +470,7 @@ onUnmounted(() => {
     <!-- Кнопка спящего режима (только на начальном экране) -->
     <Transition name="fade">
       <button 
-        v-if="currentLevel === 0" 
+        v-if="currentLevel === 0 && !isSleepMode" 
         class="sleep-mode-btn"
         @click="handleSleepMode"
         title="Спящий режим"
@@ -421,6 +493,12 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
+      </div>
+    </Transition>
+    
+    <!-- Режим сна - полноэкранный overlay -->
+    <Transition name="fade">
+      <div v-if="isSleepMode" class="sleep-overlay" @click="handleNoSleep">
       </div>
     </Transition>
   </div>
@@ -759,5 +837,16 @@ onUnmounted(() => {
 .fade-enter-to,
 .fade-leave-from {
   opacity: 1;
+}
+/* Режим сна - полноэкранный overlay */
+.sleep-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 9999;
+  cursor: pointer;
 }
 </style>

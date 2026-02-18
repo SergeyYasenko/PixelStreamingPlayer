@@ -20,14 +20,15 @@ function handleCardClick(card, index) {
       <div class="cards-grid">
         <div
           v-for="(card, index) in cards"
-          :key="`${level}-${index}-${card.command}`"
+          :key="`${level}-${card.command}`"
           class="card-wrapper"
           @click="handleCardClick(card, index)"
         >
           <Card 
             :label="card.label" 
             :index="index" 
-            :image-url="card.imageUrl" 
+            :image-url="card.imageUrl"
+            :is-priority="level === 1 && index < 3"
           />
         </div>
       </div>
