@@ -30,6 +30,7 @@ function handleCardClick(card, index) {
             :image-url="card.imageUrl"
             :is-priority="level === 1 && index < 3"
           />
+          <div v-if="!videoMode" class="card-label">{{ card.label }}</div>
         </div>
       </div>
     </div>
@@ -71,10 +72,22 @@ function handleCardClick(card, index) {
 }
 .card-wrapper {
   contain: layout style paint;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .card-wrapper:hover {
   transform: scale(1.05);
   transition: transform 0.15s ease-out;
+}
+.card-label {
+  margin-top: 1rem;
+  color: #ffffff;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 100%;
+  padding: 0 0.5rem;
 }
 @media (max-width: 1200px) {
   .cards-container {

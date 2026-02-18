@@ -4,55 +4,52 @@ import { usePixelStreaming } from '../composables/usePixelStreaming'
 import NavigationScreen from './NavigationScreen.vue'
 import Card from './Card.vue'
 
-// Уровень 1: стартовые карточки
 const LEVEL1_CARDS = [
-  { label: 'Категория 1', command: 'Category1', imageUrl: '/images/lvl1/image1.jpg' },
-  { label: 'Категория 2', command: 'Category2', imageUrl: '/images/lvl1/image2.jpg' },
-  { label: 'Категория 3', command: 'Category3', imageUrl: '/images/lvl1/image3.jpg' },
-  { label: 'Категория 4', command: 'Category4', imageUrl: '/images/lvl1/image4.jpg' },
-  { label: 'Категория 5', command: 'Category5', imageUrl: '/images/lvl1/image5.jpg' },
+  { label: 'Waldorf Astoria Residences (Nabni Developer)', command: 'Category1', imageUrl: '/images/lvl1/image1.jpg' },
+  { label: 'La Mazzoni (Luxe Developer)', command: 'Category2', imageUrl: '/images/lvl1/image2.jpg' },
+  { label: 'The Alba (Omniyat)', command: 'Category3', imageUrl: '/images/lvl1/image3.jpg' },
+  { label: 'Le Château Developer: Beyond Developments', command: 'Category4', imageUrl: '/images/lvl1/image4.jpg' },
+  { label: 'Fairmont Residences (Ardee Developer)', command: 'Category5', imageUrl: '/images/lvl1/image5.jpg' },
 ]
 
-// Карточки второго уровня для каждой категории
 const LEVEL2_CARDS_BY_CATEGORY = {
   Category1: [
-    { label: 'Видео 1.1', command: 'Video1_1', imageUrl: '/images/lvl1/SubLvl1/1.jpg' },
-    { label: 'Видео 1.2', command: 'Video1_2', imageUrl: '/images/lvl1/SubLvl1/2.jpg' },
-    { label: 'Видео 1.3', command: 'Video1_3', imageUrl: '/images/lvl1/SubLvl1/3.jpg' },
-    { label: 'Видео 1.4', command: 'Video1_4', imageUrl: '/images/lvl1/SubLvl1/4.jpg' },
-    { label: 'Видео 1.5', command: 'Video1_5', imageUrl: '/images/lvl1/SubLvl1/5.jpg' },
+    { label: 'Location & Surroundings', command: 'Video1_1', imageUrl: '/images/lvl1/SubLvl1/1.jpg' },
+    { label: 'Exterior & Facade', command: 'Video1_2', imageUrl: '/images/lvl1/SubLvl1/2.jpg' },
+    { label: 'Amenities & Lifestyle', command: 'Video1_3', imageUrl: '/images/lvl1/SubLvl1/3.jpg' },
+    { label: 'Layouts & Pricing', command: 'Video1_4', imageUrl: '/images/lvl1/SubLvl1/4.jpg' },
+    { label: 'Developer', command: 'Video1_5', imageUrl: '/images/lvl1/SubLvl1/5.jpg' },
   ],
   Category2: [
-    { label: 'Видео 2.1', command: 'Video2_1', imageUrl: '/images/lvl1/SubLvl2/1.jpg' },
-    { label: 'Видео 2.2', command: 'Video2_2', imageUrl: '/images/lvl1/SubLvl2/2.jpg' },
-    { label: 'Видео 2.3', command: 'Video2_3', imageUrl: '/images/lvl1/SubLvl2/3.jpg' },
-    { label: 'Видео 2.4', command: 'Video2_4', imageUrl: '/images/lvl1/SubLvl2/4.jpg' },
-    { label: 'Видео 2.5', command: 'Video2_5', imageUrl: '/images/lvl1/SubLvl2/5.jpg' },
+    { label: 'Location & Surroundings', command: 'Video2_1', imageUrl: '/images/lvl1/SubLvl2/1.jpg' },
+    { label: 'Exterior & Facade', command: 'Video2_2', imageUrl: '/images/lvl1/SubLvl2/2.jpg' },
+    { label: 'Amenities & Lifestyle', command: 'Video2_3', imageUrl: '/images/lvl1/SubLvl2/3.jpg' },
+    { label: 'Layouts & Pricing', command: 'Video2_4', imageUrl: '/images/lvl1/SubLvl2/4.jpg' },
+    { label: 'Developer', command: 'Video2_5', imageUrl: '/images/lvl1/SubLvl2/5.jpg' },
   ],
   Category3: [
-    { label: 'Видео 3.1', command: 'Video3_1', imageUrl: '/images/lvl1/SubLvl3/1.jpg' },
-    { label: 'Видео 3.2', command: 'Video3_2', imageUrl: '/images/lvl1/SubLvl3/2.jpg' },
-    { label: 'Видео 3.3', command: 'Video3_3', imageUrl: '/images/lvl1/SubLvl3/3.jpg' },
-    { label: 'Видео 3.4', command: 'Video3_4', imageUrl: '/images/lvl1/SubLvl3/4.jpg' },
-    { label: 'Видео 3.5', command: 'Video3_5', imageUrl: '/images/lvl1/SubLvl3/5.jpg' },
+    { label: 'Location & Surroundings', command: 'Video3_1', imageUrl: '/images/lvl1/SubLvl3/1.jpg' },
+    { label: 'Exterior & Facade', command: 'Video3_2', imageUrl: '/images/lvl1/SubLvl3/2.jpg' },
+    { label: 'Amenities & Lifestyle', command: 'Video3_3', imageUrl: '/images/lvl1/SubLvl3/3.jpg' },
+    { label: 'Layouts & Pricing', command: 'Video3_4', imageUrl: '/images/lvl1/SubLvl3/4.jpg' },
+    { label: 'Developer', command: 'Video3_5', imageUrl: '/images/lvl1/SubLvl3/5.jpg' },
   ],
   Category4: [
-    { label: 'Видео 4.1', command: 'Video4_1', imageUrl: '/images/lvl1/SubLvl4/1.jpg' },
-    { label: 'Видео 4.2', command: 'Video4_2', imageUrl: '/images/lvl1/SubLvl4/2.jpg' },
-    { label: 'Видео 4.3', command: 'Video4_3', imageUrl: '/images/lvl1/SubLvl4/3.jpg' },
-    { label: 'Видео 4.4', command: 'Video4_4', imageUrl: '/images/lvl1/SubLvl4/4.jpg' },
-    { label: 'Видео 4.5', command: 'Video4_5', imageUrl: '/images/lvl1/SubLvl4/5.jpg' },
+    { label: 'Location & Surroundings', command: 'Video4_1', imageUrl: '/images/lvl1/SubLvl4/1.jpg' },
+    { label: 'Exterior & Facade', command: 'Video4_2', imageUrl: '/images/lvl1/SubLvl4/2.jpg' },
+    { label: 'Amenities & Lifestyle', command: 'Video4_3', imageUrl: '/images/lvl1/SubLvl4/3.jpg' },
+    { label: 'Layouts & Pricing', command: 'Video4_4', imageUrl: '/images/lvl1/SubLvl4/4.jpg' },
+    { label: 'Developer', command: 'Video4_5', imageUrl: '/images/lvl1/SubLvl4/5.jpg' },
   ],
   Category5: [
-    { label: 'Видео 5.1', command: 'Video5_1', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
-    { label: 'Видео 5.2', command: 'Video5_2', imageUrl: '/images/lvl1/SubLvl5/3.jpg' },
-    { label: 'Видео 5.3', command: 'Video5_3', imageUrl: '/images/lvl1/SubLvl5/4.jpg' },
-    { label: 'Видео 5.4', command: 'Video5_4', imageUrl: '/images/lvl1/SubLvl5/5.jpg' },
-    { label: 'Видео 5.5', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
+    { label: 'Location & Surroundings', command: 'Video5_1', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
+    { label: 'Exterior & Facade', command: 'Video5_2', imageUrl: '/images/lvl1/SubLvl5/3.jpg' },
+    { label: 'Amenities & Lifestyle', command: 'Video5_3', imageUrl: '/images/lvl1/SubLvl5/4.jpg' },
+    { label: 'Layouts & Pricing', command: 'Video5_4', imageUrl: '/images/lvl1/SubLvl5/5.jpg' },
+    { label: 'Developer', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
   ],
 }
 
-// Восстанавливаем состояние из localStorage
 function loadState() {
   try {
     const saved = localStorage.getItem('pixelStreamingState')
@@ -73,7 +70,7 @@ function loadState() {
 const savedState = loadState()
 
 const videoContainer = ref(null)
-const currentLevel = ref(savedState.level) // 0 = старт, 1 = уровень 2, 2 = режим видео
+const currentLevel = ref(savedState.level)
 const selectedCategory = ref(savedState.category)
 const currentVideoIndex = ref(savedState.videoIndex)
 const showExitModal = ref(false)
@@ -82,7 +79,6 @@ const isSleepMode = ref(false)
 let mouseMoveTimer = null
 let lastMouseMoveTime = 0
 
-// Сохраняем состояние в localStorage с debounce
 let saveStateTimer = null
 function saveState() {
   if (saveStateTimer) {
@@ -99,11 +95,9 @@ function saveState() {
     } catch (e) {
       console.warn('Failed to save state to localStorage', e)
     }
-  }, 300) // Debounce 300ms
+  }, 300)
 }
 
-// Отслеживаем изменения состояния с debounce
-// Убрали deep: true - он не нужен для примитивов и вызывает лишние срабатывания
 watch([currentLevel, () => selectedCategory.value?.command, currentVideoIndex], () => {
   saveState()
 })
@@ -115,11 +109,10 @@ const {
   isConnecting,
   error,
 } = usePixelStreaming(null, {
-  useUrlParams: true, // Можно переопределить через URL параметр ?ss=...
-  signallingServerUrl: 'ws://localhost:80', // Дефолтный адрес сервера
+  useUrlParams: true,
+  signallingServerUrl: 'ws://localhost:80',
 })
 
-// Текущие карточки для отображения (максимально оптимизировано)
 const currentCards = computed(() => {
   if (currentLevel.value === 0) return LEVEL1_CARDS
   if (currentLevel.value >= 1) {
@@ -129,53 +122,35 @@ const currentCards = computed(() => {
   return []
 })
 
-// В режиме видео?
 const isVideoMode = computed(() => currentLevel.value === 2)
 
 function handleCardClick(event) {
-  const { card, level } = event
+  const { card, level, index } = event
   
-  // Пока что только навигация, без отправки команд в UE
   if (level === 1) {
-    // Клик на карточку первого уровня -> переходим на второй уровень
     selectedCategory.value = card
     currentLevel.value = 1
     
-    // Принудительная загрузка изображений второго уровня в кеш
     const categoryCards = LEVEL2_CARDS_BY_CATEGORY[card.command] || []
     categoryCards.forEach(cardItem => {
-      // Используем Image объект для мгновенной загрузки в кеш
       const img = new Image()
       img.src = cardItem.imageUrl
     })
   } else if (level === 2) {
-    // Клик на карточку второго уровня -> переходим в режим видео
     const cards = currentCards.value
     currentVideoIndex.value = cards.findIndex(c => c.command === card.command)
     if (currentVideoIndex.value === -1) currentVideoIndex.value = 0
     currentLevel.value = 2
     
-    // Отправляем команду в UE в формате строк: "project:project1" и "selection:selection1"
-    const projectCommand = selectedCategory.value?.command || ''
-    const selectionCommand = card.command || ''
+    const projectIndex = LEVEL1_CARDS.findIndex(c => c.command === selectedCategory.value?.command)
+    const projectNumber = projectIndex !== -1 ? projectIndex + 1 : 1
     
-    if (projectCommand && selectionCommand) {
-      // Извлекаем номер проекта из команды (Category1 -> 1, Category2 -> 2, и т.д.)
-      const projectMatch = projectCommand.match(/Category(\d+)/)
-      const projectNumber = projectMatch ? projectMatch[1] : '1'
-      
-      // Извлекаем номер селекции из команды (Video1_1 -> 1, Video1_2 -> 2, и т.д.)
-      const selectionMatch = selectionCommand.match(/Video\d+_(\d+)/)
-      const selectionNumber = selectionMatch ? selectionMatch[1] : '1'
-      
-      // Отправляем две отдельные команды в формате строк
-      emitUIInteraction(`project:project${projectNumber}`)
-      emitUIInteraction(`selection:selection${selectionNumber}`)
-    }
+    const selectionNumber = (index !== undefined ? index : currentVideoIndex.value) + 1
     
-    // Показываем интерфейс при переходе в режим видео
+    emitUIInteraction(`project:project${projectNumber}`)
+    emitUIInteraction(`selection:selection${selectionNumber}`)
+    
     showVideoUI.value = true
-    // Запускаем таймер скрытия
     if (mouseMoveTimer) {
       clearTimeout(mouseMoveTimer)
     }
@@ -198,8 +173,6 @@ function handleVideoPrev() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value - 1 + cards.length) % cards.length
-  
-  // Отправляем команду в UE
   emitUIInteraction('prev')
 }
 
@@ -207,22 +180,16 @@ function handleVideoNext() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value + 1) % cards.length
-  
-  // Отправляем команду в UE
   emitUIInteraction('next')
 }
 
 function handleSleepMode() {
-  // Отправляем команду в UE
   emitUIInteraction('sleep')
-  // Включаем режим сна
   isSleepMode.value = true
 }
 
 function handleNoSleep() {
-  // Отправляем команду в UE
   emitUIInteraction('nosleep')
-  // Выключаем режим сна и показываем интерфейс
   isSleepMode.value = false
   showVideoUI.value = true
 }
@@ -232,15 +199,9 @@ function handleCloseClick() {
 }
 
 function handleExitConfirm() {
-  // Отправляем команду в UE
   emitUIInteraction('exit')
-  
-  // Закрываем сессию
   showExitModal.value = false
-  // Можно закрыть окно или отправить команду в UE
   window.close()
-  // Если окно не закрывается (например, не было открыто через window.open), можно использовать:
-  // window.location.href = 'about:blank'
 }
 
 function handleExitCancel() {
@@ -248,7 +209,6 @@ function handleExitCancel() {
 }
 
 function handleMouseMove(event) {
-  // Throttling: обрабатываем не чаще чем раз в 200ms для лучшей производительности
   const now = Date.now()
   if (now - lastMouseMoveTime < 200) {
     return
@@ -259,14 +219,12 @@ function handleMouseMove(event) {
     return
   }
   
-  // Кешируем проверку для лучшей производительности
   const target = event.target
   const isOnUI = target.closest('.video-ui') || 
                  target.closest('.top-back-btn') || 
                  target.closest('.top-close-btn') ||
                  target.closest('.sleep-mode-btn')
   
-  // Если курсор на элементе интерфейса, показываем и не скрываем
   if (isOnUI) {
     if (!showVideoUI.value) {
       showVideoUI.value = true
@@ -278,17 +236,14 @@ function handleMouseMove(event) {
     return
   }
   
-  // Если курсор на видео, показываем интерфейс и запускаем таймер
   if (!showVideoUI.value) {
     showVideoUI.value = true
   }
   
-  // Сбрасываем таймер
   if (mouseMoveTimer) {
     clearTimeout(mouseMoveTimer)
   }
   
-  // Устанавливаем таймер на скрытие через 1 секунду
   mouseMoveTimer = setTimeout(() => {
     if (isVideoMode.value) {
       showVideoUI.value = false
@@ -298,8 +253,6 @@ function handleMouseMove(event) {
 
 function handleUIClick() {
   if (!isVideoMode.value) return
-  
-  // При клике на интерфейс показываем и не скрываем
   showVideoUI.value = true
   if (mouseMoveTimer) {
     clearTimeout(mouseMoveTimer)
@@ -309,8 +262,6 @@ function handleUIClick() {
 
 function handleUIMouseEnter() {
   if (!isVideoMode.value) return
-  
-  // При наведении на интерфейс показываем и не скрываем
   showVideoUI.value = true
   if (mouseMoveTimer) {
     clearTimeout(mouseMoveTimer)
@@ -321,7 +272,6 @@ function handleUIMouseEnter() {
 onMounted(() => {
   init(videoContainer.value)
   
-  // Агрессивная предзагрузка ВСЕХ изображений первого уровня
   LEVEL1_CARDS.forEach((card, idx) => {
     setTimeout(() => {
       const link = document.createElement('link')
@@ -331,13 +281,11 @@ onMounted(() => {
       link.fetchPriority = 'high'
       document.head.appendChild(link)
       
-      // Также создаем Image объект для принудительной загрузки в кеш
       const img = new Image()
       img.src = card.imageUrl
-    }, idx * 10) // Небольшая задержка чтобы не блокировать
+    }, idx * 10)
   })
   
-  // Предзагружаем изображения всех категорий второго уровня заранее
   Object.values(LEVEL2_CARDS_BY_CATEGORY).forEach((cards, catIdx) => {
     setTimeout(() => {
       cards.forEach((card, cardIdx) => {
@@ -347,10 +295,8 @@ onMounted(() => {
     }, 100 + catIdx * 50)
   })
   
-  // Восстанавливаем состояние интерфейса для режима видео
   if (currentLevel.value === 2) {
     showVideoUI.value = true
-    // Запускаем таймер скрытия
     if (mouseMoveTimer) {
       clearTimeout(mouseMoveTimer)
     }
@@ -361,7 +307,6 @@ onMounted(() => {
     }, 1000)
   }
   
-  // Добавляем обработчик движения мыши
   document.addEventListener('mousemove', handleMouseMove)
 })
 
@@ -378,10 +323,8 @@ onUnmounted(() => {
 
 <template>
   <div class="stream-view">
-    <!-- Видео контейнер (всегда на фоне) -->
     <div ref="videoContainer" class="stream-video" />
     
-    <!-- Навигационные экраны (поверх видео) -->
     <Transition name="fade" mode="out-in">
       <div v-if="currentLevel < 2 && !isSleepMode" key="nav" class="navigation-overlay">
         <NavigationScreen
@@ -394,7 +337,6 @@ onUnmounted(() => {
       </div>
     </Transition>
     
-    <!-- Режим видео: карточки внизу + стрелки -->
     <Transition name="fade" mode="out-in">
       <div v-if="isVideoMode && !isSleepMode" key="video" class="video-mode-overlay">
         <Transition name="fade">
@@ -419,7 +361,7 @@ onUnmounted(() => {
                   :key="`video-${card.command}-${index}`"
                   class="card-wrapper-small"
                   :class="{ active: index === currentVideoIndex, inactive: index !== currentVideoIndex }"
-                  @click="handleCardClick({ card, level: 2 })"
+                  @click="handleCardClick({ card, level: 2, index })"
                 >
                   <Card 
                     :key="`video-card-${index}-${card.command}`"
@@ -436,7 +378,6 @@ onUnmounted(() => {
       </div>
     </Transition>
     
-    <!-- Кнопка "Назад" (слева вверху, видна когда не на начальном экране) -->
     <Transition name="fade">
       <button 
         v-if="currentLevel > 0 && (!isVideoMode || showVideoUI) && !isSleepMode"
@@ -451,7 +392,6 @@ onUnmounted(() => {
       </button>
     </Transition>
     
-    <!-- Кнопка закрытия (справа вверху) -->
     <Transition name="fade">
       <button 
         v-if="(!isVideoMode || showVideoUI) && !isSleepMode"
@@ -467,7 +407,6 @@ onUnmounted(() => {
       </button>
     </Transition>
     
-    <!-- Кнопка спящего режима (только на начальном экране) -->
     <Transition name="fade">
       <button 
         v-if="currentLevel === 0 && !isSleepMode" 
@@ -479,7 +418,6 @@ onUnmounted(() => {
       </button>
     </Transition>
     
-    <!-- Модальное окно подтверждения выхода -->
     <Transition name="modal-fade">
       <div v-if="showExitModal" class="modal-overlay" @click="handleExitCancel">
         <div class="modal-content" @click.stop>
@@ -496,7 +434,6 @@ onUnmounted(() => {
       </div>
     </Transition>
     
-    <!-- Режим сна - полноэкранный overlay -->
     <Transition name="fade">
       <div v-if="isSleepMode" class="sleep-overlay" @click="handleNoSleep">
       </div>
@@ -550,7 +487,6 @@ onUnmounted(() => {
   height: 100%;
   z-index: 3;
   pointer-events: none;
-  /* Убрали затемнение - теперь прозрачный */
 }
 .video-ui {
   width: 100%;
@@ -591,7 +527,6 @@ onUnmounted(() => {
 .card-wrapper-small {
   position: relative;
   cursor: pointer;
-  /* Убираем transition из базового стиля для лучшей производительности */
 }
 .card-wrapper-small.active {
   transform: scale(1.1);
@@ -654,7 +589,6 @@ onUnmounted(() => {
   background: rgba(59, 130, 246, 0.4);
   border-color: #3b82f6;
 }
-/* Кнопка спящего режима */
 .sleep-mode-btn {
   position: absolute;
   bottom: 1.5rem;
@@ -684,7 +618,6 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
 }
-/* Кнопка "Назад" вверху слева */
 .top-back-btn {
   position: absolute;
   top: 1.5rem;
@@ -714,7 +647,6 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
 }
-/* Кнопка закрытия вверху справа */
 .top-close-btn {
   position: absolute;
   top: 1.5rem;
@@ -745,7 +677,6 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
 }
-/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -822,11 +753,9 @@ onUnmounted(() => {
   transform: scale(0.9);
   opacity: 0;
 }
-/* Плавные переходы между уровнями - оптимизированы */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease-out;
-  /* Убираем transform для лучшей производительности */
 }
 .fade-enter-from {
   opacity: 0;
@@ -838,7 +767,6 @@ onUnmounted(() => {
 .fade-leave-from {
   opacity: 1;
 }
-/* Режим сна - полноэкранный overlay */
 .sleep-overlay {
   position: fixed;
   top: 0;
