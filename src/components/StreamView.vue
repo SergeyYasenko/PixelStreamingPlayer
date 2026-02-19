@@ -147,8 +147,7 @@ function handleCardClick(event) {
     
     const selectionNumber = (index !== undefined ? index : currentVideoIndex.value) + 1
     
-    emitUIInteraction(`project:project${projectNumber}`)
-    emitUIInteraction(`selection:selection${selectionNumber}`)
+    emitUIInteraction({ project: `project${projectNumber}`, selection: `selection${selectionNumber}` })
     
     showVideoUI.value = true
     if (mouseMoveTimer) {
@@ -173,23 +172,23 @@ function handleVideoPrev() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value - 1 + cards.length) % cards.length
-  emitUIInteraction('prev')
+  emitUIInteraction({ cmd: 'prev' })
 }
 
 function handleVideoNext() {
   const cards = currentCards.value
   if (cards.length === 0) return
   currentVideoIndex.value = (currentVideoIndex.value + 1) % cards.length
-  emitUIInteraction('next')
+  emitUIInteraction({ cmd: 'next' })
 }
 
 function handleSleepMode() {
-  emitUIInteraction('sleep')
+  emitUIInteraction({ cmd: 'sleep' })
   isSleepMode.value = true
 }
 
 function handleNoSleep() {
-  emitUIInteraction('nosleep')
+  emitUIInteraction({ cmd: 'nosleep' })
   isSleepMode.value = false
   showVideoUI.value = true
 }
@@ -199,7 +198,7 @@ function handleCloseClick() {
 }
 
 function handleExitConfirm() {
-  emitUIInteraction('exit')
+  emitUIInteraction({ cmd: 'exit' })
   showExitModal.value = false
   window.close()
 }
