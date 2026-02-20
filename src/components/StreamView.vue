@@ -46,7 +46,7 @@ const LEVEL2_CARDS_BY_CATEGORY = {
     { label: 'Exterior & Facade', command: 'Video5_2', imageUrl: '/images/lvl1/SubLvl5/3.jpg' },
     { label: 'Amenities & Lifestyle', command: 'Video5_3', imageUrl: '/images/lvl1/SubLvl5/4.jpg' },
     { label: 'Layouts & Pricing', command: 'Video5_4', imageUrl: '/images/lvl1/SubLvl5/5.jpg' },
-    { label: 'Developer', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
+    // { label: 'Developer', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
   ],
 }
 
@@ -355,20 +355,23 @@ onUnmounted(() => {
             <div class="video-bottom-panel">
               <div class="cards-row">
                 <div class="cards-row-background"></div>
-                <div
-                  v-for="(card, index) in currentCards"
-                  :key="`video-${card.command}-${index}`"
-                  class="card-wrapper-small"
-                  :class="{ active: index === currentVideoIndex, inactive: index !== currentVideoIndex }"
-                  @click="handleCardClick({ card, level: 2, index })"
-                >
-                  <Card 
-                    :key="`video-card-${index}-${card.command}`"
-                    :label="card.label" 
-                    :index="index" 
-                    :image-url="card.imageUrl"
-                    :is-priority="index === currentVideoIndex"
-                  />
+                <div class="cards-row-inner">
+                  <div
+                    v-for="(card, index) in currentCards"
+                    :key="`video-${card.command}-${index}`"
+                    class="card-wrapper-small"
+                    :class="{ active: index === currentVideoIndex, inactive: index !== currentVideoIndex }"
+                    @click="handleCardClick({ card, level: 2, index })"
+                  >
+                    <Card 
+                      :key="`video-card-${index}-${card.command}`"
+                      :label="card.label" 
+                      :index="index" 
+                      :image-url="card.imageUrl"
+                      :is-priority="index === currentVideoIndex"
+                    />
+                    <div class="card-label-small">{{ card.label }}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -507,17 +510,21 @@ onUnmounted(() => {
 }
 .cards-row {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0;
-  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+}
+.cards-row-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
 }
 .cards-row-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(128, 128, 128, 0.5);
   border-radius: 16px;
   z-index: 0;
@@ -526,21 +533,21 @@ onUnmounted(() => {
 .card-wrapper-small {
   position: relative;
   cursor: pointer;
+  flex: 0 0 180px;
+  max-width: 220px;
 }
 .card-wrapper-small.active {
-  transform: scale(1.1);
   z-index: 1;
   opacity: 1;
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  transition: opacity 0.2s ease-out;
 }
 .card-wrapper-small.inactive {
   opacity: 0.5;
   transition: opacity 0.2s ease-out;
 }
 .card-wrapper-small:hover:not(.active) {
-  transform: scale(1.05);
   opacity: 0.8;
-  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+  transition: opacity 0.15s ease-out;
 }
 .card-wrapper-small.active:hover {
   opacity: 1;
@@ -555,8 +562,20 @@ onUnmounted(() => {
   max-width: 220px;
   margin: 0 auto;
 }
-.card-wrapper-small :deep(.card-label) {
-  font-size: 0.85rem;
+.card-wrapper-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.card-label-small {
+  margin-top: 0.10rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+  font-size: 0.75rem;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  padding: 0 0.25rem;
 }
 .nav-arrow {
   width: 56px;

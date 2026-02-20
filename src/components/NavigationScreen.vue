@@ -51,12 +51,27 @@ function handleCardClick(card, index) {
 .cards-container {
   width: 100%;
   max-width: 1400px;
+  display: flex;
+  justify-content: center;
 }
 .cards-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
   width: 100%;
+}
+.card-wrapper {
+  flex: 0 0 200px;
+  max-width: 240px;
+  contain: layout style paint;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cards-container.cards-bottom .card-wrapper {
+  flex: 0 0 160px;
+  max-width: 200px;
 }
 .cards-container.cards-bottom {
   position: absolute;
@@ -64,20 +79,12 @@ function handleCardClick(card, index) {
   left: 50%;
   transform: translateX(-50%);
   max-width: 1000px;
-  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin: 0 auto;
   padding: 0 80px;
   box-sizing: border-box;
 }
-.card-wrapper {
-  contain: layout style paint;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 .card-wrapper:hover {
-  transform: scale(1.05);
   transition: transform 0.15s ease-out;
 }
 .card-label {
@@ -90,21 +97,19 @@ function handleCardClick(card, index) {
   padding: 0 0.5rem;
 }
 @media (max-width: 1200px) {
-  .cards-container {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  .cards-container.cards-bottom {
-    grid-template-columns: repeat(5, 1fr);
+  .card-wrapper {
+    flex: 0 0 180px;
+    max-width: 200px;
   }
 }
 @media (max-width: 768px) {
-  .cards-container {
-    grid-template-columns: repeat(2, 1fr);
+  .card-wrapper {
+    flex: 0 0 140px;
+    max-width: 160px;
   }
-  .cards-container.cards-bottom {
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.5rem;
+  .cards-container.cards-bottom .card-wrapper {
+    flex: 0 0 120px;
+    max-width: 140px;
   }
 }
 </style>
