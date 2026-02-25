@@ -46,7 +46,7 @@ const LEVEL2_CARDS_BY_CATEGORY = {
     { label: 'Exterior & Facade', command: 'Video5_2', imageUrl: '/images/lvl1/SubLvl5/3.jpg' },
     { label: 'Amenities & Lifestyle', command: 'Video5_3', imageUrl: '/images/lvl1/SubLvl5/4.jpg' },
     { label: 'Layouts & Pricing', command: 'Video5_4', imageUrl: '/images/lvl1/SubLvl5/5.jpg' },
-    // { label: 'Developer', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
+    { label: 'Elevastia', command: 'Video5_5', imageUrl: '/images/lvl1/SubLvl5/1.jpg' },
   ],
 }
 
@@ -73,11 +73,8 @@ const videoContainer = ref(null)
 const currentLevel = ref(savedState.level)
 const selectedCategory = ref(savedState.category)
 const currentVideoIndex = ref(savedState.videoIndex)
-const showExitModal = ref(false)
 const showVideoUI = ref(true)
 const isSleepMode = ref(false)
-let mouseMoveTimer = null
-let lastMouseMoveTime = 0
 
 let saveStateTimer = null
 function saveState() {
@@ -148,14 +145,6 @@ function handleCardClick(event) {
     const selectionNumber = (index !== undefined ? index : currentVideoIndex.value) + 1
     
     emitUIInteraction({ project: `project${projectNumber}`, selection: `selection${selectionNumber}` })
-    
-    showVideoUI.value = true
-    if (mouseMoveTimer) {
-      clearTimeout(mouseMoveTimer)
-    }
-    mouseMoveTimer = setTimeout(() => {
-      showVideoUI.value = false
-    }, 1000)
   }
 }
 
@@ -193,81 +182,6 @@ function handleNoSleep() {
   showVideoUI.value = true
 }
 
-function handleCloseClick() {
-  showExitModal.value = true
-}
-
-function handleExitConfirm() {
-  emitUIInteraction({ cmd: 'exit' })
-  showExitModal.value = false
-  window.close()
-}
-
-function handleExitCancel() {
-  showExitModal.value = false
-}
-
-function handleMouseMove(event) {
-  const now = Date.now()
-  if (now - lastMouseMoveTime < 200) {
-    return
-  }
-  lastMouseMoveTime = now
-  
-  if (!isVideoMode.value) {
-    return
-  }
-  
-  const target = event.target
-  const isOnUI = target.closest('.video-ui') || 
-                 target.closest('.top-back-btn') || 
-                 target.closest('.top-close-btn') ||
-                 target.closest('.sleep-mode-btn')
-  
-  if (isOnUI) {
-    if (!showVideoUI.value) {
-      showVideoUI.value = true
-    }
-    if (mouseMoveTimer) {
-      clearTimeout(mouseMoveTimer)
-      mouseMoveTimer = null
-    }
-    return
-  }
-  
-  if (!showVideoUI.value) {
-    showVideoUI.value = true
-  }
-  
-  if (mouseMoveTimer) {
-    clearTimeout(mouseMoveTimer)
-  }
-  
-  mouseMoveTimer = setTimeout(() => {
-    if (isVideoMode.value) {
-      showVideoUI.value = false
-    }
-  }, 1000)
-}
-
-function handleUIClick() {
-  if (!isVideoMode.value) return
-  showVideoUI.value = true
-  if (mouseMoveTimer) {
-    clearTimeout(mouseMoveTimer)
-    mouseMoveTimer = null
-  }
-}
-
-function handleUIMouseEnter() {
-  if (!isVideoMode.value) return
-  showVideoUI.value = true
-  if (mouseMoveTimer) {
-    clearTimeout(mouseMoveTimer)
-    mouseMoveTimer = null
-  }
-}
-
 onMounted(() => {
   init(videoContainer.value)
   
@@ -294,29 +208,12 @@ onMounted(() => {
     }, 100 + catIdx * 50)
   })
   
-  if (currentLevel.value === 2) {
-    showVideoUI.value = true
-    if (mouseMoveTimer) {
-      clearTimeout(mouseMoveTimer)
-    }
-    mouseMoveTimer = setTimeout(() => {
-      if (isVideoMode.value) {
-        showVideoUI.value = false
-      }
-    }, 1000)
-  }
-  
-  document.addEventListener('mousemove', handleMouseMove)
 })
 
 onUnmounted(() => {
-  if (mouseMoveTimer) {
-    clearTimeout(mouseMoveTimer)
-  }
   if (saveStateTimer) {
     clearTimeout(saveStateTimer)
   }
-  document.removeEventListener('mousemove', handleMouseMove)
 })
 </script>
 
@@ -339,7 +236,7 @@ onUnmounted(() => {
     <Transition name="fade" mode="out-in">
       <div v-if="isVideoMode && !isSleepMode" key="video" class="video-mode-overlay">
         <Transition name="fade">
-          <div v-if="showVideoUI" class="video-ui" @click="handleUIClick" @mouseenter="handleUIMouseEnter">
+          <div v-if="showVideoUI" class="video-ui">
             <button class="nav-arrow nav-arrow-side nav-arrow-side-left" @click="handleVideoPrev">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                 <path d="M15 18l-6-6 6-6" />
@@ -385,26 +282,10 @@ onUnmounted(() => {
         v-if="currentLevel > 0 && (!isVideoMode || showVideoUI) && !isSleepMode"
         class="top-back-btn"
         @click="handleBack"
-        @mouseenter="handleUIMouseEnter"
         title="Назад"
       >
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-      </button>
-    </Transition>
-    
-    <Transition name="fade">
-      <button 
-        v-if="(!isVideoMode || showVideoUI) && !isSleepMode"
-        class="top-close-btn"
-        @click="handleCloseClick"
-        @mouseenter="handleUIMouseEnter"
-        title="Закрыть"
-      >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
     </Transition>
@@ -418,22 +299,6 @@ onUnmounted(() => {
       >
         <img src="/images/icons/moon.png" alt="Спящий режим" width="36" height="36" />
       </button>
-    </Transition>
-    
-    <Transition name="modal-fade">
-      <div v-if="showExitModal" class="modal-overlay" @click="handleExitCancel">
-        <div class="modal-content" @click.stop>
-          <h3 class="modal-title">Вы точно уверены?</h3>
-          <div class="modal-buttons">
-            <button class="modal-btn modal-btn-confirm" @click="handleExitConfirm">
-              Да
-            </button>
-            <button class="modal-btn modal-btn-cancel" @click="handleExitCancel">
-              Нет
-            </button>
-          </div>
-        </div>
-      </div>
     </Transition>
     
     <Transition name="fade">
@@ -664,112 +529,6 @@ onUnmounted(() => {
 .top-back-btn svg {
   width: 32px;
   height: 32px;
-}
-.top-close-btn {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 10;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, transform 0.2s ease;
-  backdrop-filter: blur(8px);
-}
-.top-close-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
-  transform: scale(1.05);
-}
-.top-close-btn:active {
-  transform: scale(0.95);
-}
-.top-close-btn svg {
-  width: 32px;
-  height: 32px;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-.modal-content {
-  background: rgba(22, 22, 28, 0.95);
-  border-radius: 16px;
-  padding: 2rem;
-  min-width: 320px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-}
-.modal-title {
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 1.5rem 0;
-  text-align: center;
-}
-.modal-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-.modal-btn {
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.modal-btn-confirm {
-  background: #ef4444;
-  color: #fff;
-}
-.modal-btn-confirm:hover {
-  background: #dc2626;
-  transform: scale(1.05);
-}
-.modal-btn-cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.modal-btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
-}
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-.modal-fade-enter-active .modal-content,
-.modal-fade-leave-active .modal-content {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.modal-fade-enter-from .modal-content,
-.modal-fade-leave-to .modal-content {
-  transform: scale(0.9);
-  opacity: 0;
 }
 .fade-enter-active,
 .fade-leave-active {
