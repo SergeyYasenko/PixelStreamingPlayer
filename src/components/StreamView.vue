@@ -182,6 +182,14 @@ function handleNoSleep() {
   showVideoUI.value = true
 }
 
+function handleAutoClick() {
+  emitUIInteraction({ cmd: 'auto' })
+}
+
+function handleLinkClick() {
+  emitUIInteraction('link')
+}
+
 onMounted(() => {
   init(videoContainer.value)
   
@@ -288,6 +296,23 @@ onUnmounted(() => {
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
+    </Transition>
+    
+    <Transition name="fade">
+      <div v-if="(!isVideoMode || showVideoUI) && !isSleepMode" class="top-right-btns">
+        <button class="top-icon-btn" title="Авто режим" @click="handleAutoClick">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 11-9-9" />
+            <path d="M21 3v9h-9" />
+          </svg>
+        </button>
+        <button class="top-icon-btn" title="Ссылка" @click="handleLinkClick">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        </button>
+      </div>
     </Transition>
     
     <Transition name="fade">
@@ -529,6 +554,39 @@ onUnmounted(() => {
 .top-back-btn svg {
   width: 32px;
   height: 32px;
+}
+.top-right-btns {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+}
+.top-icon-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+.top-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+.top-icon-btn:active {
+  transform: scale(0.95);
+}
+.top-icon-btn svg {
+  width: 24px;
+  height: 24px;
 }
 .fade-enter-active,
 .fade-leave-active {
