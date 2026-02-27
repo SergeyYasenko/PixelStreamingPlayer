@@ -192,6 +192,48 @@ function handleLinkClick() {
   showVideoPanel.value = !showVideoPanel.value
 }
 
+function invertMouseCoordinates(event) {
+  const el = event.target
+  const rect = el.getBoundingClientRect()
+  const invertedX = rect.width - (event.clientX - rect.left)
+  return { clientX: rect.left + invertedX, clientY: event.clientY }
+}
+
+let mirrorCleanup = null
+function setupVideoMirrorInput() {
+  const container = videoContainer.value
+  if (!container) return
+  const video = container.querySelector('video')
+  if (!video || mirrorCleanup) return
+
+  const handler = (e) => {
+    if (e.inverted) return
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    const { clientX, clientY } = invertMouseCoordinates(e)
+    const newEvent = new MouseEvent(e.type, {
+      clientX,
+      clientY,
+      bubbles: e.bubbles,
+      cancelable: e.cancelable,
+    })
+    newEvent.inverted = true
+    video.dispatchEvent(newEvent)
+  }
+
+  const events = ['mousedown', 'mouseup', 'mousemove', 'click', 'dblclick']
+  events.forEach((eventType) => {
+    video.addEventListener(eventType, handler, true)
+  })
+
+  mirrorCleanup = () => {
+    events.forEach((eventType) => {
+      video.removeEventListener(eventType, handler, true)
+    })
+    mirrorCleanup = null
+  }
+}
+
 onMounted(() => {
   init(videoContainer.value)
   
@@ -217,13 +259,25 @@ onMounted(() => {
       })
     }, 100 + catIdx * 50)
   })
-  
+})
+
+function trySetupMirror() {
+  if (!isConnected.value || !videoContainer.value) return
+  setupVideoMirrorInput()
+  if (!mirrorCleanup) setTimeout(trySetupMirror, 100)
+}
+
+watch(isConnected, (connected) => {
+  if (connected) {
+    setTimeout(trySetupMirror, 50)
+  } else if (mirrorCleanup) {
+    mirrorCleanup()
+  }
 })
 
 onUnmounted(() => {
-  if (saveStateTimer) {
-    clearTimeout(saveStateTimer)
-  }
+  if (saveStateTimer) clearTimeout(saveStateTimer)
+  if (mirrorCleanup) mirrorCleanup()
 })
 </script>
 
@@ -357,9 +411,12 @@ onUnmounted(() => {
   background-size: cover, cover, 200px 200px;
 }
 .stream-video :deep(video) {
+  transform: scaleX(-1);
   width: 100%;
   height: 100%;
   object-fit: contain;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .navigation-overlay {
   position: absolute;
