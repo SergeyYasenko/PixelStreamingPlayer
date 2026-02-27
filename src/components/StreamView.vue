@@ -74,6 +74,7 @@ const currentLevel = ref(savedState.level)
 const selectedCategory = ref(savedState.category)
 const currentVideoIndex = ref(savedState.videoIndex)
 const showVideoUI = ref(true)
+const showVideoPanel = ref(true)
 const isSleepMode = ref(false)
 
 let saveStateTimer = null
@@ -140,9 +141,9 @@ function handleCardClick(event) {
     currentLevel.value = 2
     
     const projectIndex = LEVEL1_CARDS.findIndex(c => c.command === selectedCategory.value?.command)
-    const projectNumber = projectIndex !== -1 ? projectIndex + 1 : 1
+    const projectNumber = projectIndex !== -1 ? projectIndex : 0
     
-    const selectionNumber = (index !== undefined ? index : currentVideoIndex.value) + 1
+    const selectionNumber = index !== undefined ? index : currentVideoIndex.value
     
     emitUIInteraction({ project: `project${projectNumber}`, selection: `selection${selectionNumber}` })
   }
@@ -188,6 +189,7 @@ function handleAutoClick() {
 
 function handleLinkClick() {
   emitUIInteraction('link')
+  showVideoPanel.value = !showVideoPanel.value
 }
 
 onMounted(() => {
@@ -244,7 +246,7 @@ onUnmounted(() => {
     <Transition name="fade" mode="out-in">
       <div v-if="isVideoMode && !isSleepMode" key="video" class="video-mode-overlay">
         <Transition name="fade">
-          <div v-if="showVideoUI" class="video-ui">
+          <div v-if="showVideoUI && showVideoPanel" class="video-ui">
             <button class="nav-arrow nav-arrow-side nav-arrow-side-left" @click="handleVideoPrev">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                 <path d="M15 18l-6-6 6-6" />
